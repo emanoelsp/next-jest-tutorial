@@ -12,7 +12,7 @@
 4. [Estrutura do Projeto](#-estrutura-do-projeto)
 5. [Comandos Disponíveis](#-comandos-disponíveis)
 6. [Executando os Testes](#-executando-os-testes)
-7. [Conceitos de Testes Explicados](#-conceitos-de-testes-explicados)
+7. [Guia Detalhado: O Que Cada Teste Faz](#-guia-detalhado-o-que-cada-teste-faz)
 8. [Cobertura de Código](#-cobertura-de-código)
 9. [Troubleshooting](#-troubleshooting)
 10. [Referências e Próximos Passos](#-referências-e-próximos-passos)
@@ -31,13 +31,9 @@ Este repositório é um **projeto didático** para aprender testes automatizados
 - ✅ Testes de API Route (App Router)
 - ✅ Cobertura de código
 
-A stack utilizada é equivalente ao **JUnit** no mundo Java: **Jest** + **React Testing Library** são o padrão moderno para testes em aplicações React/Next.js.
-
 ---
 
 ## 📦 Pré-requisitos
-
-Antes de começar, certifique-se de ter instalado:
 
 | Ferramenta | Versão Mínima | Como verificar |
 |------------|---------------|----------------|
@@ -45,77 +41,40 @@ Antes de começar, certifique-se de ter instalado:
 | **npm** | 10+ | `npm -v` |
 | **Git** | Qualquer | `git --version` |
 
-> 💡 **Dica:** Se não tiver Node.js, baixe em [nodejs.org](https://nodejs.org/).
-
 ---
 
 ## 🚀 Clonando e Executando o Projeto
 
-### 1️⃣ Clonar o repositório
-
 ```bash
 git clone <URL_DO_REPOSITORIO>
 cd next-jest-tutorial
-```
-
-Substitua `<URL_DO_REPOSITORIO>` pela URL do repositório (ex: `https://github.com/seu-usuario/next-jest-tutorial.git`).
-
-### 2️⃣ Instalar as dependências
-
-```bash
 npm install
+npm run dev   # opcional — abre http://localhost:3000
 ```
-
-Este comando baixa todas as dependências listadas no `package.json`, incluindo:
-
-- **Next.js** — framework React
-- **Jest** — runner de testes
-- **React Testing Library** — testes de componentes
-- **@testing-library/jest-dom** — matchers extras (ex: `toBeInTheDocument()`)
-- **@testing-library/user-event** — simulação de interações do usuário
-
-### 3️⃣ Rodar a aplicação (opcional)
-
-```bash
-npm run dev
-```
-
-Abra o navegador em **http://localhost:3000** para ver a aplicação em execução.
 
 ---
 
 ## 📁 Estrutura do Projeto
 
 ```
-next-jest-tutorial/
-├── jest.config.ts          # Configuração do Jest para Next.js
-├── jest.setup.ts           # Setup global (ex: jest-dom)
-├── package.json
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── hello/
-│   │   │       ├── route.ts        # API Route
-│   │   │       └── route.test.ts   # Teste da API
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── components/
-│   │   ├── Counter.tsx
-│   │   ├── Counter.test.tsx
-│   │   ├── Greeting.tsx
-│   │   ├── Greeting.test.tsx
-│   │   ├── User.tsx
-│   │   └── User.test.tsx
-│   ├── services/
-│   │   ├── api.ts
-│   │   └── api.test.ts
-│   └── utils/
-│       ├── math.ts
-│       └── math.test.ts
-└── README.md
+src/
+├── utils/
+│   ├── math.ts           # Funções puras (soma, divisão)
+│   └── math.test.ts      # Testes das funções
+├── components/
+│   ├── Counter.tsx       # Contador com botão
+│   ├── Counter.test.tsx
+│   ├── Greeting.tsx      # Saudação com props
+│   ├── Greeting.test.tsx
+│   ├── User.tsx          # Busca usuário (assíncrono)
+│   └── User.test.tsx
+├── services/
+│   ├── api.ts            # Serviço que simula API
+│   └── api.test.ts
+└── app/api/hello/
+    ├── route.ts          # API Route GET
+    └── route.test.ts
 ```
-
-**Convenção:** arquivos de teste ficam ao lado do código fonte com sufixo `.test.ts` ou `.test.tsx`.
 
 ---
 
@@ -123,259 +82,347 @@ next-jest-tutorial/
 
 | Comando | Descrição |
 |---------|-----------|
-| `npm run dev` | Inicia o servidor de desenvolvimento |
-| `npm run build` | Gera build de produção |
-| `npm run start` | Inicia o servidor em modo produção |
 | `npm test` | Executa todos os testes |
-| `npm run test:watch` | Executa testes em modo watch (re-executa ao salvar) |
-| `npm run test:coverage` | Executa testes e gera relatório de cobertura |
-| `npm run lint` | Executa o linter |
+| `npm run test:watch` | Modo watch — re-executa ao salvar |
+| `npm run test:coverage` | Testes + relatório de cobertura |
+| `npm run dev` | Servidor de desenvolvimento |
 
 ---
 
 ## 🧪 Executando os Testes
 
-### Rodar todos os testes
-
 ```bash
 npm test
 ```
 
-Saída esperada (exemplo):
+---
 
-```
- PASS  src/utils/math.test.ts
- PASS  src/components/Counter.test.tsx
- PASS  src/components/Greeting.test.tsx
- PASS  src/components/User.test.tsx
- PASS  src/services/api.test.ts
- PASS  src/app/api/hello/route.test.ts
+## 📖 Guia Detalhado: O Que Cada Teste Faz
 
-Test Suites: 6 passed, 6 total
-Tests:       9 passed, 9 total
-```
-
-### Rodar em modo watch (TDD)
-
-```bash
-npm run test:watch
-```
-
-Ideal para desenvolvimento: o Jest re-executa automaticamente quando você salva alterações nos arquivos.
-
-### Rodar um arquivo específico
-
-```bash
-npm test -- src/utils/math.test.ts
-```
-
-### Rodar testes por nome
-
-```bash
-npm test -- -t "should sum two numbers"
-```
-
-### Gerar cobertura de código
-
-```bash
-npm run test:coverage
-```
-
-Gera relatório no terminal e HTML em `coverage/lcov-report/index.html`.
+Esta seção explica **cada teste** do projeto: qual arquivo usa, o que testa e como testa.
 
 ---
 
-## 📚 Conceitos de Testes Explicados
+### 1️⃣ Testes de `math` — Funções Puras
 
-### 1. Testes de Lógica (Funções Puras)
+| | |
+|---|---|
+| **Arquivo de código** | `src/utils/math.ts` |
+| **Arquivo de teste** | `src/utils/math.test.ts` |
+| **O que testa** | Funções `sum` e `divide` |
 
-**Arquivo:** `src/utils/math.ts` e `src/utils/math.test.ts`
+#### Código testado (`math.ts`)
 
-Funções puras são fáceis de testar: mesma entrada → mesma saída, sem efeitos colaterais.
+```ts
+export function sum(a: number, b: number): number {
+  return a + b;
+}
 
-**Conceitos usados:**
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error("Cannot divide by zero");
+  }
+  return a / b;
+}
+```
 
-| Conceito | Exemplo | Descrição |
-|----------|---------|-----------|
-| `describe` | `describe('Math utils', () => {...})` | Agrupa testes relacionados |
-| `it` | `it('should sum two numbers', () => {...})` | Define um caso de teste |
-| `expect` | `expect(sum(2, 3)).toBe(5)` | Asserção (verificação) |
-| `toBe` | `expect(x).toBe(5)` | Igualdade estrita (`===`) |
-| `toThrow` | `expect(() => divide(10, 0)).toThrow(...)` | Verifica se uma função lança erro |
+#### Teste 1: `should sum two numbers`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se a função `sum` retorna a soma correta |
+| **Como testa** | Chama `sum(2, 3)` e verifica se o resultado é `5` |
+| **Ferramenta** | `expect(valor).toBe(esperado)` — igualdade estrita |
+
+```ts
+expect(sum(2, 3)).toBe(5);
+```
 
 ---
 
-### 2. Testes de Componentes React
+#### Teste 2: `should divide two numbers`
 
-**Arquivo:** `src/components/Counter.tsx` e `src/components/Counter.test.tsx`
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se a função `divide` retorna a divisão correta |
+| **Como testa** | Chama `divide(10, 2)` e verifica se o resultado é `5` |
 
-**Conceitos usados:**
-
-| Conceito | Exemplo | Descrição |
-|----------|---------|-----------|
-| `render` | `render(<Counter />)` | Renderiza o componente em ambiente simulado |
-| `screen` | `screen.getByText('Count: 0')` | Busca elementos na tela como um usuário faria |
-| `getByRole` | `screen.getByRole('button', { name: /increment/i })` | Busca por papel de acessibilidade (boa prática) |
-| `userEvent` | `await userEvent.click(button)` | Simula interação real do usuário |
-| `toBeInTheDocument` | `expect(...).toBeInTheDocument()` | Matcher do jest-dom para verificar presença no DOM |
-
-> 💡 **Boas práticas:** Prefira `getByRole` e `getByLabelText` para testes mais acessíveis e resilientes.
+```ts
+expect(divide(10, 2)).toBe(5);
+```
 
 ---
 
-### 3. Testes de Props
+#### Teste 3: `should throw error when dividing by zero`
 
-**Arquivo:** `src/components/Greeting.tsx` e `src/components/Greeting.test.tsx`
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se `divide` lança erro ao dividir por zero |
+| **Como testa** | Chama `divide(10, 0)` dentro de uma função e verifica se ela lança `"Cannot divide by zero"` |
+| **Por que a função?** | `expect(() => divide(10, 0)).toThrow(...)` — o Jest precisa executar a chamada para capturar o erro; se chamasse direto, o erro interromperia o teste |
 
-Testa se o componente renderiza corretamente com diferentes props.
+```ts
+expect(() => divide(10, 0)).toThrow("Cannot divide by zero");
+```
+
+---
+
+### 2️⃣ Testes do `Counter` — Componente com Estado e Interação
+
+| | |
+|---|---|
+| **Arquivo de código** | `src/components/Counter.tsx` |
+| **Arquivo de teste** | `src/components/Counter.test.tsx` |
+| **O que testa** | Contador que inicia em 0 e incrementa ao clicar no botão |
+
+#### Código testado (`Counter.tsx`)
+
+```tsx
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+```
+
+#### Teste 1: `should render initial value`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se o contador começa em 0 |
+| **Como testa** | 1. `render(<Counter />)` — renderiza o componente em um DOM virtual<br>2. `screen.getByText("Count: 0")` — busca o texto na tela<br>3. `expect(...).toBeInTheDocument()` — verifica se o elemento existe |
+| **Ferramentas** | `render`, `screen`, `getByText`, `toBeInTheDocument` |
+
+```tsx
+render(<Counter />);
+expect(screen.getByText("Count: 0")).toBeInTheDocument();
+```
+
+---
+
+#### Teste 2: `should increment when button is clicked`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se o contador aumenta ao clicar no botão |
+| **Como testa** | 1. Renderiza o componente<br>2. Encontra o botão por `getByRole("button", { name: /increment/i })` — busca por papel (button) e texto (Increment)<br>3. Simula cliente com `userEvent.click(button)`<br>4. Verifica se o texto mudou para "Count: 1" |
+| **Por que `getByRole`?** | Boa prática de acessibilidade — o usuário encontra o botão pelo texto visível |
+| **Por que `async`?** | `userEvent.click` retorna uma Promise |
+
+```tsx
+render(<Counter />);
+const button = screen.getByRole("button", { name: /increment/i });
+await userEvent.click(button);
+expect(screen.getByText("Count: 1")).toBeInTheDocument();
+```
+
+---
+
+### 3️⃣ Testes do `Greeting` — Componente com Props
+
+| | |
+|---|---|
+| **Arquivo de código** | `src/components/Greeting.tsx` |
+| **Arquivo de teste** | `src/components/Greeting.test.tsx` |
+| **O que testa** | Se o componente exibe corretamente o nome recebido por props |
+
+#### Código testado (`Greeting.tsx`)
+
+```tsx
+export default function Greeting({ name }: Props) {
+  return <h1>Hello, {name}!</h1>;
+}
+```
+
+#### Teste: `should render name correctly`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se o nome passado por props aparece na tela |
+| **Como testa** | 1. `render(<Greeting name="Carlos" />)` — renderiza com prop `name`<br>2. `getByRole("heading", { name: "Hello, Carlos!" })` — busca o `<h1>` pelo texto completo<br>3. Verifica se está no documento |
+| **Por que `getByRole("heading")`?** | O elemento é um título (`<h1>`); buscar por role garante que a estrutura semântica está correta |
 
 ```tsx
 render(<Greeting name="Carlos" />);
-expect(screen.getByRole('heading', { name: 'Hello, Carlos!' })).toBeInTheDocument();
+expect(
+  screen.getByRole("heading", { name: "Hello, Carlos!" })
+).toBeInTheDocument();
 ```
 
 ---
 
-### 4. Mock de Funções e Testes Assíncronos
+### 4️⃣ Testes do `User` — Componente Assíncrono com Mock
 
-**Arquivo:** `src/components/User.tsx` e `src/components/User.test.tsx`
+| | |
+|---|---|
+| **Arquivo de código** | `src/components/User.tsx` |
+| **Arquivo de teste** | `src/components/User.test.tsx` |
+| **Dependência** | `src/services/api.ts` (função `fetchUser`) |
+| **O que testa** | Se o componente exibe o nome do usuário após a "API" retornar |
 
-O componente `User` chama `fetchUser()` (API) no `useEffect`. Para não depender da API real, usamos **mock**.
+#### Código testado (`User.tsx`)
 
-**Conceitos usados:**
+```tsx
+export default function User() {
+  const [name, setName] = useState("");
+  useEffect(() => {
+    fetchUser().then((data) => setName(data.name));
+  }, []);
+  return <p>{name ? `User: ${name}` : "Loading..."}</p>;
+}
+```
 
-| Conceito | Exemplo | Descrição |
-|----------|---------|-----------|
-| `jest.mock` | `jest.mock('../services/api')` | Substitui o módulo inteiro por uma versão mockada |
-| `jest.spyOn` | `jest.spyOn(api, 'fetchUser')` | Espiona e pode sobrescrever uma função específica |
-| `mockResolvedValue` | `.mockResolvedValue({ name: 'João' })` | Define o valor retornado pela Promise |
-| `waitFor` | `await waitFor(() => {...})` | Aguarda condição assíncrona ser satisfeita |
+O componente chama `fetchUser()` ao montar e exibe "Loading..." até a resposta chegar.
+
+#### Teste: `should show user name after fetch`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se o nome do usuário aparece após o fetch |
+| **Problema** | O teste não pode depender da API real (lenta, instável, pode falhar) |
+| **Solução** | **Mock** — substituir `fetchUser` por uma versão falsa que retorna dados controlados |
+
+**Como testa (passo a passo):**
+
+1. **`jest.mock("../services/api")`** — substitui todo o módulo `api` por um mock
+2. **`jest.spyOn(api, "fetchUser").mockResolvedValue({ name: "Joao" })`** — faz `fetchUser` retornar `{ name: "Joao" }` em vez de chamar a API real
+3. **`render(<User />)`** — o componente chama `fetchUser` no `useEffect`
+4. **`waitFor(() => expect(screen.getByText("User: Joao")).toBeInTheDocument())`** — aguarda o estado assíncrono atualizar e o texto aparecer
+
+```tsx
+jest.mock("../services/api");
+
+jest.spyOn(api, "fetchUser").mockResolvedValue({ name: "Joao" });
+render(<User />);
+
+await waitFor(() => {
+  expect(screen.getByText("User: Joao")).toBeInTheDocument();
+});
+```
+
+| Ferramenta | Função |
+|------------|--------|
+| `jest.mock` | Substitui o módulo inteiro |
+| `jest.spyOn` | Espiona e sobrescreve uma função específica |
+| `mockResolvedValue` | Define o valor que a Promise retorna |
+| `waitFor` | Aguarda uma condição assíncrona (re-tenta até passar ou timeout) |
 
 ---
 
-### 5. Testes de API Route
+### 5️⃣ Testes do `api` — Serviço (Função Assíncrona)
 
-**Arquivo:** `src/app/api/hello/route.ts` e `src/app/api/hello/route.test.ts`
+| | |
+|---|---|
+| **Arquivo de código** | `src/services/api.ts` |
+| **Arquivo de teste** | `src/services/api.test.ts` |
+| **O que testa** | Se a função `fetchUser` retorna o objeto esperado |
 
-API Routes do Next.js rodam no **Node.js**, não no browser. Por isso usamos:
+#### Código testado (`api.ts`)
+
+```ts
+export async function fetchUser() {
+  return { name: "Maria" };
+}
+```
+
+#### Teste: `should return the default user`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se `fetchUser` retorna `{ name: "Maria" }` |
+| **Como testa** | `expect(fetchUser()).resolves.toEqual({ name: "Maria" })` — para funções assíncronas, usa `.resolves` para aguardar a Promise e comparar o resultado |
+
+```ts
+await expect(fetchUser()).resolves.toEqual({ name: "Maria" });
+```
+
+---
+
+### 6️⃣ Testes da API Route `hello`
+
+| | |
+|---|---|
+| **Arquivo de código** | `src/app/api/hello/route.ts` |
+| **Arquivo de teste** | `src/app/api/hello/route.test.ts` |
+| **O que testa** | Se a rota GET retorna `{ message: "Hello World" }` |
+
+#### Código testado (`route.ts`)
+
+```ts
+export async function GET() {
+  return NextResponse.json({ message: "Hello World" });
+}
+```
+
+#### Teste: `should return hello world message`
+
+| Campo | Descrição |
+|-------|-----------|
+| **O que faz** | Verifica se a resposta da API contém a mensagem correta |
+| **Como testa** | 1. Chama `GET()` diretamente (não precisa de servidor HTTP)<br>2. Converte a resposta em JSON com `response.json()`<br>3. Verifica se `data` é igual a `{ message: "Hello World" }` |
+| **`@jest-environment node`** | Comentário no topo do arquivo — API Routes rodam no Node.js, não no browser. Sem isso, o Jest usaria jsdom e poderia dar erro (`Request is not defined`). |
 
 ```ts
 /**
  * @jest-environment node
  */
+const response = await GET();
+const data = await response.json();
+expect(data).toEqual({ message: "Hello World" });
 ```
-
-Isso garante que o Jest use o ambiente Node para esse arquivo, evitando erros como `Request is not defined`.
 
 ---
 
 ## 📊 Cobertura de Código
 
-Execute:
-
 ```bash
 npm run test:coverage
 ```
 
-O relatório mostra:
-
 | Métrica | Significado |
 |---------|-------------|
-| **% Stmts** | Porcentagem de statements executados |
-| **% Branch** | Porcentagem de branches (if/else) testados |
-| **% Funcs** | Porcentagem de funções chamadas |
-| **% Lines** | Porcentagem de linhas executadas |
+| **% Stmts** | Statements executados |
+| **% Branch** | Branches (if/else) testados |
+| **% Funcs** | Funções chamadas |
+| **% Lines** | Linhas executadas |
 
-Um relatório HTML detalhado é gerado em:
-
-```
-coverage/lcov-report/index.html
-```
-
-Abra no navegador para ver linha a linha o que está coberto.
+Relatório HTML: `coverage/lcov-report/index.html`
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Erro: `Request is not defined` em teste de route
-
-**Causa:** O teste de API Route está rodando no ambiente jsdom (browser).
-
-**Solução:** Adicione no topo do arquivo de teste:
-
-```ts
-/**
- * @jest-environment node
- */
-```
+| Erro | Solução |
+|------|---------|
+| `Request is not defined` em teste de route | Adicione `/** @jest-environment node */` no topo do arquivo |
+| `toBeInTheDocument is not a function` | Verifique se `jest.setup.ts` importa `@testing-library/jest-dom` |
+| Jest não encontra testes | Use `*.test.ts` ou `*.test.tsx` |
+| Testes instáveis | Execute `npm test -- --runInBand` |
 
 ---
 
-### Erro: `toBeInTheDocument is not a function`
+## 📖 Referências
 
-**Causa:** O `@testing-library/jest-dom` não está carregado.
-
-**Solução:** Verifique se `jest.setup.ts` contém:
-
-```ts
-import '@testing-library/jest-dom';
-```
-
-E se `jest.config.ts` referencia o setup:
-
-```ts
-setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-```
-
----
-
-### Jest não encontra os testes
-
-**Causa:** Padrão de nome incorreto.
-
-**Solução:** Use `*.test.ts` ou `*.test.tsx` para os arquivos de teste.
-
----
-
-### Testes instáveis ou falhas intermitentes
-
-**Solução:** Execute em série:
-
-```bash
-npm test -- --runInBand
-```
-
----
-
-## 📖 Referências e Próximos Passos
-
-- [Jest — Documentação oficial](https://jestjs.io/)
+- [Jest](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/react)
-- [Testing Library — Guia de queries](https://testing-library.com/docs/queries/about)
 - [Next.js — Testing](https://nextjs.org/docs/app/building-your-application/testing/jest)
 
-### Fluxo recomendado no dia a dia
-
-1. Implemente a funcionalidade
-2. Rode `npm test`
-3. Rode `npm run test:coverage`
-4. Para iteração rápida, use `npm run test:watch`
-
 ---
 
-## 🏆 Resumo dos Conceitos Aprendidos
+## 🏆 Resumo: O Que Cada Arquivo Testa
 
-| Conceito | Onde é usado |
-|----------|--------------|
-| Testes unitários | `math.test.ts` |
-| Testes de componentes | `Counter.test.tsx`, `Greeting.test.tsx` |
-| Testes assíncronos | `User.test.tsx` |
-| Mock de dependências | `User.test.tsx` |
-| Testes de API | `route.test.ts` |
-| Cobertura de código | `npm run test:coverage` |
-| Simulação de interação | `userEvent` em `Counter.test.tsx` |
-| Boas práticas (getByRole) | `Counter.test.tsx`, `Greeting.test.tsx` |
+| Arquivo de teste | Código testado | O que verifica |
+|------------------|----------------|----------------|
+| `math.test.ts` | `math.ts` | `sum` e `divide` (incluindo erro de divisão por zero) |
+| `Counter.test.tsx` | `Counter.tsx` | Valor inicial e incremento ao clicar |
+| `Greeting.test.tsx` | `Greeting.tsx` | Renderização do nome via props |
+| `User.test.tsx` | `User.tsx` | Exibição do nome após fetch (com mock) |
+| `api.test.ts` | `api.ts` | Retorno de `fetchUser` |
+| `route.test.ts` | `route.ts` | Resposta JSON da API Route GET |
 
 ---
 
